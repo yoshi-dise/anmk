@@ -15,4 +15,4 @@ cd anmk && python downloader.py
 ```
 please note that i use python 3.10, so u need to use similar version, maybe 3.8+
 
-> To update the video list, u can run `scraper.py` with `python scraper.py` and it will automatically update the `titles.txt`
+> To update the video list, u can run `scraper.py` with `python scraper.py` and it will automatically update the `target.txt`

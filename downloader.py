@@ -4,21 +4,8 @@ import os
 import moviepy.editor as editor
 
 ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4])
-with open("titles.txt", "r") as titlesfile:
+with open("target.txt", "r") as titlesfile:
     titles = titlesfile.read().split("\n")[:-1]
-    for idx in range(0, len(titles)):
-        x = titles[idx].split("-")
-        for idn, y in enumerate(x):
-            if(y == "part"):
-                x[-2] = "P{}".format(x[-1])
-                del x[-1]
-            elif(re.search("p[0-9]", y) != None):
-                x[-1] = x[-1].upper()
-            else:
-                x[idn] = y.capitalize()
-
-        x = "".join(x)
-        titles[idx] = x
     baselink = "https://cdn.animatic.fun/PUBLIC/{title}/media/{filename}"
     curdir = os.getcwd()
     try:

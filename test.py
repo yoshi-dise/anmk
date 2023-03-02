@@ -1,30 +1,74 @@
 import re
 import os
 import requests
-import moviepy.editor as editor
-curdir = os.getcwd()
-path = os.path.join(curdir, "Animation/BorrowedMount") 
-files = os.listdir(path)
-vids = []
-clips = []
-auds = []
-for fl in files:
-    if fl.endswith("mp3"):
-        auds.append(fl)
-    else:
-        vids.append(fl)
-vids = sorted(vids, key=lambda x: int(x[:2]))
-auds = sorted(auds, key=lambda x: int(x[:2]))
-offset = 0
-for idx, vid in enumerate(vids):
-    clip = editor.VideoFileClip(path+"/"+vid)
-    try:
-        aclip = editor.AudioFileClip(path+"/"+auds[idx - offset])
-        clip = clip.set_audio(aclip)
-    except:
-        offset = offset + 1
+dick = []
+with open("target.txt", "r") as f:
+    titles = f.read().split("\n")[:-1]
+    for title in titles:
+        ttype = "new"
+        newbaselink = "https://cdn.animatic.fun/PUBLIC/{title}/media/{filename}"
+        oldbaselink = "https://cdn.animatic.fun/PUBLIC/{title}/media/Animatic/{filename}"
+        x = title.split("-")
+        for idn, y in enumerate(x):
+            if(y == "part"):
+                x[-2] = "P{}".format(x[-1])
+                del x[-1]
+            elif(re.search("p[0-9]", y) != None):
+                x[-1] = x[-1].upper()
+            else:
+                x[idn] = y.capitalize()
+        newtitle = "".join(x)
+        oldtitle = " ".join(x)
+        oldertitle = " ".join(x).lower().capitalize()
+        x[-1] = x[-1].capitalize()
+        x[-2] = x[-2].lower()
+        oldertitle2 = " ".join(x).capitalize()
 
-    clips.append(clip)
+        print("testing "+ newbaselink.format(title=newtitle, filename="01I.mp4"))
+        res = requests.get(newbaselink.format(title=newtitle, filename="01I.mp4"))
+        if res.status_code == 403:
+            print("testing "+ newbaselink.format(title=newtitle, filename="01L.mp4"))
+            res = requests.get(newbaselink.format(title=newtitle, filename=f"01L.mp4"))
+            if res.status_code == 403:
+                print("testing "+ oldbaselink.format(title=oldtitle, filename="01I.mp4"))
+                res = requests.get(oldbaselink.format(title=oldtitle, filename=f"01I.mp4"))
+                if res.status_code == 403:
+                    print("testing "+ oldbaselink.format(title=oldtitle, filename="01L.mp4"))
+                    res = requests.get(oldbaselink.format(title=oldtitle, filename=f"01L.mp4"))
+                    if res.status_code == 403:
+                        print("testing "+ oldbaselink.format(title=oldertitle, filename="01I.mp4"))
+                        res = requests.get(oldbaselink.format(title=oldertitle, filename=f"01I.mp4"))
+                        if res.status_code == 403:
+                            print("testing "+ oldbaselink.format(title=oldertitle, filename="01L.mp4"))
+                            res = requests.get(oldbaselink.format(title=oldertitle, filename=f"01L.mp4"))
+                            if res.status_code == 403:
+                                print("testing "+ oldbaselink.format(title=oldertitle2, filename="01I.mp4"))
+                                res = requests.get(oldbaselink.format(title=oldertitle2, filename=f"01I.mp4"))
+                                if res.status_code == 403:
+                                    print("testing "+ oldbaselink.format(title=oldertitle2, filename="01L.mp4"))
+                                    res = requests.get(oldbaselink.format(title=oldertitle2, filename=f"01L.mp4"))
+                                    if res.status_code == 403:
+                                        print("unknown error, maybe the title doesnt even exist")
+                                        ttype = "unknown"
+                                else: ttype = "older2"
+                            else:
+                                ttype = "older"
+                        else:
+                            ttype = "older"
+                    else:
+                        ttype = "old"
+                else:
+                    ttype = "old"
+            else:
+                ttype = "new"
+        else:
+            ttype = "new"
+        print(ttype)
+        dick.append([title, ttype])
 
-final_clip = editor.concatenate_videoclips(clips)
-final_clip.write_videofile("BorrowedMount.mp4")
+txt = ""
+for dic in dick:
+    txt = txt + dic[0] + "@" + dic[1] + "\n"
+f = open("titles2.txt", "w")
+f.write(txt)
+f.close()
